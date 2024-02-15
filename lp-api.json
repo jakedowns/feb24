@@ -1,0 +1,886 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/disparity": {
+      "post": {
+        "operationId": "TransactionController_estimateMonoDepth",
+        "x-codeSamples": [
+          {
+            "label": "Python",
+            "lang": "Python",
+            "source": "import uuid\nimport requests\ncorrelation_id = str(uuid.uuid4())\nrequests.post(\n    'https://api.leiapix.com/api/v1/disparity', \n    headers={\n        'Authorization': 'Bearer {access_token}'  # acquired in previous step\n    },\n    json={\n        'correlationId': correlation_id,\n        'inputImageUrl': ORIGINAL_IMAGE_URL,  # this can be any image you want to get disparity for\n        'resultPresignedUrl': put_disparity_presigned_url  # acquired in previous step\n    },\n    timeout=5 * 60  # expires in 3 min\n)"
+          },
+          {
+            "label": "Node.js",
+            "lang": "javascript",
+            "source": "const uuid = require('uuid');\nconst axios = require('axios');\n\nconst correlationId = uuid.v4();\n\naxios.post(\n    'https://api.leiapix.com/api/v1/disparity',\n    {\n        correlationId,\n        inputImageUrl: ORIGINAL_IMAGE_URL, // this can be any image you want to get disparity for\n        resultPresignedUrl: putDisparityPresignedUrl, // acquired in previous step\n    },\n    {\n        headers: {\n            Authorization: 'Bearer {accessToken}', // acquired in previous step\n        },\n        timeout: 5 * 60 * 1000, // expires in 5 min\n    });\n    "
+          }
+        ],
+        "summary": "Disparity Map",
+        "description": "Historically, a disparity map is a visual representation of the differences in pixel coordinates between the corresponding points in a stereo image pair. It is typically generated from a pair of stereo images taken from slightly different viewpoints (left and right cameras). Using the power of the LeiaPix Cloud API, you can now generate a disparity map for any standard 2D image.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "The input parameters for the disparity map estimation.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RESTMonoDepthEstimationParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request has succeeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RESTAPICallResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request has invalid parameters"
+          },
+          "401": {
+            "description": "Returned if the user is not authenticated or authentication parameters are invalid"
+          },
+          "402": {
+            "description": "Returned it there is not enough credit balance"
+          }
+        },
+        "tags": [
+          "Media Transformation"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/animation": {
+      "post": {
+        "operationId": "TransactionController_generateAnimation",
+        "x-codeSamples": [
+          {
+            "label": "Python",
+            "lang": "Python",
+            "source": "import uuid\nimport requests\ncorrelation_id = str(uuid.uuid4())\nrequests.post(\n    'https://api.leiapix.com/api/v1/animation',\n    headers={\n        'Authorization': 'Bearer {access_token}'  # acquired in previous step\n    },\n    json={\n        'correlationId': correlation_id,\n        'inputDisparityUrl': disparity_presigned_url,  # acquired in previous step\n        'resultPresignedUrl': put_animation_presigned_url,  # acquired in previous step\n    },\n    timeout=5 * 60  # expires in 3 min\n)"
+          },
+          {
+            "label": "Node.js",
+            "lang": "javascript",
+            "source": "const uuid = require('uuid');\nconst axios = require('axios');\n\nconst correlationId = uuid.v4();\n\naxios.post(\n    'https://api.leiapix.com/api/v1/animation',\n    {\n        correlationId,\n        inputDisparityUrl: disparityPresignedUrl, // acquired in previous step\n        resultPresignedUrl: putAnimationPresignedUrl, // acquired in previous step\n    },\n    {\n        headers: {\n            Authorization: 'Bearer {accessToken}', // acquired in previous step\n        },\n        timeout: 5 * 60 * 1000, // expires in 5 min\n    });\n    "
+          }
+        ],
+        "summary": "Animation",
+        "description": "This API allows you to generate a captivating 3D animation. By utilizing the input disparity map and a single image, this generates an immersive 3D animation that adds depth and realism to the image.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "The input parameters for the animation generation.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RESTAnimationGenerationParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request has succeeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RESTAPICallResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request has invalid parameters"
+          },
+          "401": {
+            "description": "Returned if the user is not authenticated or authentication parameters are invalid"
+          },
+          "402": {
+            "description": "Returned it there is not enough credit balance"
+          }
+        },
+        "tags": [
+          "Media Transformation"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/sbs": {
+      "post": {
+        "operationId": "TransactionController_generateStereoSbs",
+        "x-codeSamples": [
+          {
+            "label": "Python",
+            "lang": "Python",
+            "source": "\nimport uuid\nimport requests\ncorrelation_id = str(uuid.uuid4())\nrequests.post(\n    'https://api.leiapix.com/api/v1/sbs', \n    headers={\n        'Authorization': 'Bearer {access_token}'  # acquired in previous step\n    },\n    json={\n        'correlationId': correlation_id,\n        'inputImageUrl': ORIGINAL_IMAGE_URL,  # this can be any image you want to get disparity for\n        'inputDisparityUrl': disparity_presigned_url,  # acquired in previous step\n        'resultPresignedUrl': put_sbs_presigned_url  # acquired in previous step\n    },\n    timeout=5 * 60  # expires in 3 min\n)"
+          },
+          {
+            "label": "Node.js",
+            "lang": "javascript",
+            "source": "const uuid = require('uuid');\nconst axios = require('axios');\n\nconst correlationId = uuid.v4();\n\naxios.post(\n    'https://api.leiapix.com/api/v1/sbs',\n    {\n        correlationId,\n        inputImageUrl: ORIGINAL_IMAGE_URL, // this can be any image you want to get disparity for\n        inputDisparityUrl: disparityPresignedUrl, // acquired in previous step\n        resultPresignedUrl: putSbsPresignedUrl, // acquired in previous step\n    },\n    {\n        headers: {\n            Authorization: 'Bearer {accessToken}', // acquired in previous step\n        },\n        timeout: 5 * 60 * 1000, // expires in 5 min\n    });\n    "
+          }
+        ],
+        "summary": "Stereo SBS",
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "The input parameters for the SBS generation",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RESTStereoSbsGenerationParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request has succeeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RESTAPICallResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request has invalid parameters"
+          },
+          "401": {
+            "description": "Returned if the user is not authenticated or authentication parameters are invalid"
+          },
+          "402": {
+            "description": "Returned it there is not enough credit balance"
+          }
+        },
+        "tags": [
+          "Media Transformation"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/topBottom": {
+      "post": {
+        "operationId": "TransactionController_generateStereoTopBottom",
+        "x-codeSamples": [
+          {
+            "label": "Python",
+            "lang": "Python",
+            "source": "\nimport uuid\nimport requests\ncorrelation_id = str(uuid.uuid4())\nrequests.post(\n    'https://api.leiapix.com/api/v1/topBottom', \n    headers={\n        'Authorization': 'Bearer {access_token}'  # acquired in previous step\n    },\n    json={\n        'correlationId': correlation_id,\n        'inputImageUrl': ORIGINAL_IMAGE_URL,  # this can be any image you want to get disparity for\n        'inputDisparityUrl': disparity_presigned_url,  # acquired in previous step\n        'resultPresignedUrl': put_sbs_presigned_url  # acquired in previous step\n    },\n    timeout=5 * 60  # expires in 3 min\n)"
+          },
+          {
+            "label": "Node.js",
+            "lang": "javascript",
+            "source": "const uuid = require('uuid');\nconst axios = require('axios');\n\nconst correlationId = uuid.v4();\n\naxios.post(\n    'https://api.leiapix.com/api/v1/topBottom',\n    {\n        correlationId,\n        inputImageUrl: ORIGINAL_IMAGE_URL, // this can be any image you want to get disparity for\n        inputDisparityUrl: disparityPresignedUrl, // acquired in previous step\n        resultPresignedUrl: putSbsPresignedUrl, // acquired in previous step\n    },\n    {\n        headers: {\n            Authorization: 'Bearer {accessToken}', // acquired in previous step\n        },\n        timeout: 5 * 60 * 1000, // expires in 5 min\n    });\n    "
+          }
+        ],
+        "summary": "Stereo Top-Bottom",
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "The input parameters for the topBottom generation",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RESTStereoTopBottomGenerationParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request has succeeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RESTAPICallResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request has invalid parameters"
+          },
+          "401": {
+            "description": "Returned if the user is not authenticated or authentication parameters are invalid"
+          },
+          "402": {
+            "description": "Returned it there is not enough credit balance"
+          }
+        },
+        "tags": [
+          "Media Transformation"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/decode": {
+      "post": {
+        "operationId": "TransactionController_decodeLif",
+        "x-codeSamples": [
+          {
+            "label": "Python",
+            "lang": "Python",
+            "source": "import uuid\nimport requests\ncorrelation_id = str(uuid.uuid4())\nrequests.post(\n    'https://api.leiapix.com/api/v1/decode', \n    headers={\n        'Authorization': 'Bearer {access_token}'  # acquired in previous step\n    },\n    json={\n        'correlationId': correlation_id,\n        'inputImageUrl': ORIGINAL_IMAGE_URL,  # this can be any image you want to get disparity for\n        'resultPresignedUrl': put_disparity_presigned_url  # acquired in previous step\n    },\n    timeout=5 * 60  # expires in 3 min\n)"
+          },
+          {
+            "label": "Node.js",
+            "lang": "javascript",
+            "source": "const uuid = require('uuid');\nconst axios = require('axios');\n\nconst correlationId = uuid.v4();\n\naxios.post(\n    'https://api.leiapix.com/api/v1/decode',\n    {\n        correlationId,\n        inputImageUrl: ORIGINAL_IMAGE_URL, // this can be any image you want to get disparity for\n        resultPresignedUrl: putDisparityPresignedUrl, // acquired in previous step\n    },\n    {\n        headers: {\n            Authorization: 'Bearer {accessToken}', // acquired in previous step\n        },\n        timeout: 5 * 60 * 1000, // expires in 5 min\n    });\n    "
+          }
+        ],
+        "summary": "LIF Decoder",
+        "description": "This API allows you to decode a LIF file into a 2D image.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "The input parameters for the LIF decoder",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RESTLifDecoderParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request has succeeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RESTAPICallResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request has invalid parameters"
+          },
+          "401": {
+            "description": "Returned if the user is not authenticated or authentication parameters are invalid"
+          },
+          "402": {
+            "description": "Returned it there is not enough credit balance"
+          }
+        },
+        "tags": [
+          "Media Transformation"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/encode": {
+      "post": {
+        "operationId": "TransactionController_encodeLif",
+        "x-codeSamples": [
+          {
+            "label": "Python",
+            "lang": "Python",
+            "source": "import uuid\nimport requests\ncorrelation_id = str(uuid.uuid4())\nrequests.post(\n    'https://api.leiapix.com/api/v1/encode', \n    headers={\n        'Authorization': 'Bearer {access_token}'  # acquired in previous step\n    },\n    json={\n        'correlationId': correlation_id,\n        'inputImageUrl': ORIGINAL_IMAGE_URL,  # this can be any image you want to get disparity for\n        'resultPresignedUrl': put_disparity_presigned_url  # acquired in previous step\n    },\n    timeout=5 * 60  # expires in 3 min\n)"
+          },
+          {
+            "label": "Node.js",
+            "lang": "javascript",
+            "source": "const uuid = require('uuid');\nconst axios = require('axios');\n\nconst correlationId = uuid.v4();\n\naxios.post(\n    'https://api.leiapix.com/api/v1/encode',\n    {\n        correlationId,\n        inputImageUrl: ORIGINAL_IMAGE_URL, // this can be any image you want to get disparity for\n        resultPresignedUrl: putDisparityPresignedUrl, // acquired in previous step\n    },\n    {\n        headers: {\n            Authorization: 'Bearer {accessToken}', // acquired in previous step\n        },\n        timeout: 5 * 60 * 1000, // expires in 5 min\n    });\n    "
+          }
+        ],
+        "summary": "LIF Encoder",
+        "description": "This API allows you to encode a 2D image into a LIF file.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "The input parameters for the LIF encoder",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RESTLifEncoderParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request has succeeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RESTAPICallResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request has invalid parameters"
+          },
+          "401": {
+            "description": "Returned if the user is not authenticated or authentication parameters are invalid"
+          },
+          "402": {
+            "description": "Returned it there is not enough credit balance"
+          }
+        },
+        "tags": [
+          "Media Transformation"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/get-upload-url": {
+      "get": {
+        "operationId": "StorageController_getStoragePresignedUrl",
+        "x-codeSamples": [
+          {
+            "label": "Python",
+            "lang": "Python",
+            "source": "import uuid\nimport requests\ncorrelation_id = str(uuid.uuid4())\nrequests.get(\n    'https://api.leiapix.com/api/v1/get-upload-url',\n    headers={\n        'Authorization': 'Bearer {access_token}'  # acquired in previous step\n    },\n    timeout=5 * 60  # expires in 3 min\n)"
+          },
+          {
+            "label": "Node.js",
+            "lang": "javascript",
+            "source": "const uuid = require('uuid');\nconst axios = require('axios');\n\nconst correlationId = uuid.v4();\n\naxios.get(\n    'https://api.leiapix.com/api/v1/get-upload-url',\n    {},\n    headers: {\n        Authorization: 'Bearer {accessToken}', // acquired in previous step\n    },\n    timeout: 5 * 60 * 1000, // expires in 5 min\n});\n    "
+          }
+        ],
+        "summary": "Get Presigned URL",
+        "description": "Get a presigned URL for uploading a file to Leia Storage with 24hrs expiration",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RESTGetStorageUrlParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request has succeeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RESTStorageApiCallResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request has invalid parameters"
+          },
+          "401": {
+            "description": "Returned if the user is not authenticated or authentication parameters are invalid"
+          },
+          "402": {
+            "description": "Returned it there is not enough credit balance"
+          }
+        },
+        "tags": [
+          "Storage"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "LeiaPix Cloud API",
+    "description": "LeiaPix Cloud APIs provide a seamless and efficient way to leverage the power of computer vision and generate estimated disparity maps from 2D images. With just a simple API call, you can extract valuable depth information from your images, revealing the relative distances of objects in the scene.\n\nOur first API endpoint allows you to submit a 2D image and receive an estimated disparity map as the output. This disparity map highlights the variations in pixel disparities, enabling you to perceive the scene's depth and spatial layout. It opens up possibilities for applications such as 3D reconstruction, depth-based analysis, and more.\n\nBut that's not all! We go a step further by offering a second API endpoint that takes estimated disparity map and creates stunning 3D animations. Our API generates smooth and realistic 3D animations that bring your static images to life. With fine gain control over how obejcts should move within the scene, this unlocks a whole new realm of visual storytelling. \n\nOur REST APIs are designed to be user-friendly, scalable, and efficient, ensuring that you can seamlessly integrate them into your existing workflows or develop new applications. Experience the power of our APIs and unlock the potential of disparity maps and 3D animations in your projects today.\n\nYou will need Client ID & secret to access the APIs. Please refer to [LeiaPix Cloud Documentation](https://cloud.leiapix.com) for more information. \n\nIf you have feedback or encounter any issues with the API, please reach out on [Discord](https://discord.gg/leiapix)",
+    "version": "2.7.1",
+    "contact": {
+      "name": "Discord",
+      "url": "https://discord.gg/leiapix",
+      "email": ""
+    },
+    "termsOfService": "https://cloud.leiapix.com/terms-of-service"
+  },
+  "tags": [
+    {
+      "name": "Media Transformation",
+      "description": ""
+    },
+    {
+      "name": "Storage",
+      "description": ""
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://api.leiapix.com"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "RESTMonoDepthEstimationParams": {
+        "type": "object",
+        "properties": {
+          "inputImageUrl": {
+            "type": "string",
+            "description": "Readable input image url",
+            "example": "https://..."
+          },
+          "resultPresignedUrl": {
+            "type": "string",
+            "description": "Presigned URL where the service should write the results to. The URL MUST have 'PUT' permission so the service can write the result to. For more details about signed URLs, please refer to your respective cloud providers.",
+            "example": "https://..."
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "UUID to correlate this request. This must be unique for each request. If not provided, the service will generate one",
+            "example": "4d4eb584-a5cd-453b-8b67-567c1df26cb4"
+          },
+          "dilation": {
+            "type": "number",
+            "description": "Dilation parameter",
+            "maximum": 0.01,
+            "minimum": -0.01
+          },
+          "inputType": {
+            "type": "string",
+            "description": "Type of image input",
+            "enum": [
+              "image2d",
+              "image360"
+            ]
+          },
+          "outputBitDepth": {
+            "type": "string",
+            "description": "Output bit depth",
+            "enum": [
+              "uint8",
+              "uint16"
+            ]
+          }
+        },
+        "required": [
+          "inputImageUrl"
+        ]
+      },
+      "RESTAPICallResult": {
+        "type": "object",
+        "properties": {
+          "correlationId": {
+            "type": "string",
+            "description": "Unique query identifier",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "resultPresignedUrl": {
+            "type": "string",
+            "description": "Presigned url where processing result had been uploaded",
+            "example": "https://s3.eu-central-1.amazonaws.com/3d-photo-api-dev-output/1.jpg"
+          }
+        },
+        "required": [
+          "correlationId",
+          "resultPresignedUrl"
+        ]
+      },
+      "RESTAnimationGenerationParams": {
+        "type": "object",
+        "properties": {
+          "inputImageUrl": {
+            "type": "string",
+            "description": "Readable input image url",
+            "example": "https://..."
+          },
+          "resultPresignedUrl": {
+            "type": "string",
+            "description": "Presigned URL where the service should write the results to. The URL MUST have 'PUT' permission so the service can write the result to. For more details about signed URLs, please refer to your respective cloud providers.",
+            "example": "https://..."
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "UUID to correlate this request. This must be unique for each request. If not provided, the service will generate one",
+            "example": "4d4eb584-a5cd-453b-8b67-567c1df26cb4"
+          },
+          "inputDisparityUrl": {
+            "type": "string",
+            "description": "Readable input disparity url",
+            "example": "https://..."
+          },
+          "animationType": {
+            "type": "string",
+            "description": "Type of animation",
+            "enum": [
+              "mp4",
+              "gif"
+            ]
+          },
+          "pattern": {
+            "type": "string",
+            "description": "Pattern for the animation. Must be comma-separated list of floats enclosed in curly braces.",
+            "example": "{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}"
+          },
+          "animationLength": {
+            "type": "number",
+            "description": "Duration of the animation. This controls how fast or slow the animation should be. For example, a value of 1 would create the fastest and 6 would create the slowest animations.",
+            "maximum": 6,
+            "minimum": 1
+          },
+          "outputWidth": {
+            "type": "number",
+            "description": "Output image width",
+            "example": 600
+          },
+          "outputHeight": {
+            "type": "number",
+            "description": "Output image height",
+            "example": 450
+          },
+          "amplitudeX": {
+            "type": "number",
+            "description": "Amount of motion in X axis.",
+            "maximum": 10,
+            "minimum": 0
+          },
+          "amplitudeY": {
+            "type": "number",
+            "description": "Amount of motion in Y axis.",
+            "maximum": 10,
+            "minimum": 0
+          },
+          "amplitudeZ": {
+            "type": "number",
+            "description": "Amount of motion in Z axis.",
+            "maximum": 10,
+            "minimum": 0
+          },
+          "phaseX": {
+            "type": "number",
+            "description": "The starting point or offset of the motion in the x-axis. For example, a phase value of 0 indicates that the motion starts from the origin.",
+            "maximum": 7,
+            "minimum": 0
+          },
+          "phaseY": {
+            "type": "number",
+            "description": "The starting point or offset of the motion in the Y-axis. For example, a phase value of 0 indicates that the motion starts from the origin.",
+            "maximum": 7,
+            "minimum": 0
+          },
+          "phaseZ": {
+            "type": "number",
+            "description": "The starting point or offset of the motion in the Z-axis. For example, a phase value of 0 indicates that the motion starts from the origin.",
+            "maximum": 7,
+            "minimum": 0
+          },
+          "gain": {
+            "type": "number",
+            "description": "Floating point gain value",
+            "maximum": 10,
+            "minimum": 0
+          },
+          "convergence": {
+            "type": "number",
+            "description": "A floating point number that specifies the convergence between -1 to 1.",
+            "maximum": 1,
+            "minimum": -1
+          },
+          "numberOfLoops": {
+            "type": "number",
+            "description": "Number of times the animation should loop. If not provided, the animation will not loop.",
+            "maximum": 10,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "inputImageUrl",
+          "inputDisparityUrl"
+        ]
+      },
+      "RESTStereoSbsGenerationParams": {
+        "type": "object",
+        "properties": {
+          "inputImageUrl": {
+            "type": "string",
+            "description": "Readable input image url",
+            "example": "https://..."
+          },
+          "resultPresignedUrl": {
+            "type": "string",
+            "description": "Presigned URL where the service should write the results to. The URL MUST have 'PUT' permission so the service can write the result to. For more details about signed URLs, please refer to your respective cloud providers.",
+            "example": "https://..."
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "UUID to correlate this request. This must be unique for each request. If not provided, the service will generate one",
+            "example": "4d4eb584-a5cd-453b-8b67-567c1df26cb4"
+          },
+          "inputDisparityUrl": {
+            "type": "string",
+            "description": "Readable input disparity url",
+            "example": "https://..."
+          },
+          "width": {
+            "type": "number",
+            "description": "Output image width",
+            "example": 600
+          },
+          "height": {
+            "type": "number",
+            "description": "Output image height",
+            "example": 450
+          },
+          "gain": {
+            "type": "number",
+            "description": "Floating point gain value",
+            "maximum": 10,
+            "minimum": 0
+          },
+          "gainMultiplier": {
+            "type": "number",
+            "description": "Floating point gain multiplier value",
+            "maximum": 10,
+            "minimum": 0
+          },
+          "convergence": {
+            "type": "number",
+            "description": "A floating point number that specifies the convergence between -1 to 1.",
+            "maximum": 1,
+            "minimum": -1
+          }
+        },
+        "required": [
+          "inputImageUrl",
+          "inputDisparityUrl"
+        ]
+      },
+      "RESTStereoTopBottomGenerationParams": {
+        "type": "object",
+        "properties": {
+          "inputImageUrl": {
+            "type": "string",
+            "description": "Readable input image url",
+            "example": "https://..."
+          },
+          "resultPresignedUrl": {
+            "type": "string",
+            "description": "Presigned URL where the service should write the results to. The URL MUST have 'PUT' permission so the service can write the result to. For more details about signed URLs, please refer to your respective cloud providers.",
+            "example": "https://..."
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "UUID to correlate this request. This must be unique for each request. If not provided, the service will generate one",
+            "example": "4d4eb584-a5cd-453b-8b67-567c1df26cb4"
+          },
+          "inputDisparityUrl": {
+            "type": "string",
+            "description": "Readable input disparity url",
+            "example": "https://..."
+          },
+          "width": {
+            "type": "number",
+            "description": "Output image width",
+            "example": 600
+          },
+          "height": {
+            "type": "number",
+            "description": "Output image height",
+            "example": 450
+          },
+          "gain": {
+            "type": "number",
+            "description": "Floating point gain value",
+            "maximum": 10,
+            "minimum": 0
+          },
+          "gainMultiplier": {
+            "type": "number",
+            "description": "Floating point gain multiplier value",
+            "maximum": 10,
+            "minimum": 0
+          },
+          "convergence": {
+            "type": "number",
+            "description": "A floating point number that specifies the convergence between -1 to 1.",
+            "maximum": 1,
+            "minimum": -1
+          }
+        },
+        "required": [
+          "inputImageUrl",
+          "inputDisparityUrl"
+        ]
+      },
+      "RESTLifDecoderParams": {
+        "type": "object",
+        "properties": {
+          "inputImageUrl": {
+            "type": "string",
+            "description": "Readable input image url",
+            "example": "https://..."
+          },
+          "resultPresignedUrl": {
+            "type": "string",
+            "description": "Presigned URL where the service should write the results to. The URL MUST have 'PUT' permission so the service can write the result to. For more details about signed URLs, please refer to your respective cloud providers.",
+            "example": "https://..."
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "UUID to correlate this request. This must be unique for each request. If not provided, the service will generate one",
+            "example": "4d4eb584-a5cd-453b-8b67-567c1df26cb4"
+          }
+        },
+        "required": [
+          "inputImageUrl"
+        ]
+      },
+      "RESTLifEncoderParams": {
+        "type": "object",
+        "properties": {
+          "resultPresignedUrl": {
+            "type": "string",
+            "description": "Readable output image url",
+            "example": "https://..."
+          },
+          "inputSingleImageUrl": {
+            "type": "string",
+            "description": "Readable input image url",
+            "example": "https://..."
+          },
+          "inputSingleDisparityUrl": {
+            "type": "string",
+            "description": "Readable input disparity url",
+            "example": "https://..."
+          },
+          "inputLeftImageUrl": {
+            "type": "string",
+            "description": "Readable input image url",
+            "example": "https://..."
+          },
+          "inputRightImageUrl": {
+            "type": "string",
+            "description": "Readable input image url",
+            "example": "https://..."
+          },
+          "inputLeftDisparityUrl": {
+            "type": "string",
+            "description": "Readable input disparity url",
+            "example": "https://..."
+          },
+          "inputRightDisparityUrl": {
+            "type": "string",
+            "description": "Readable input disparity url",
+            "example": "https://..."
+          },
+          "inputDisparitySource": {
+            "type": "string",
+            "description": "Disparity source"
+          },
+          "gain": {
+            "type": "number",
+            "description": "Floating point gain value",
+            "maximum": 10,
+            "minimum": 0
+          },
+          "convergence": {
+            "type": "number",
+            "description": "A floating point number that specifies the convergence between -1 to 1.",
+            "maximum": 1,
+            "minimum": -1
+          },
+          "pre-convergence": {
+            "type": "number",
+            "description": "Preconvergence is floating value from the camera app"
+          },
+          "dof": {
+            "type": "number",
+            "description": "Depth of field is floating value from the camera app"
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "UUID to correlate this request. This must be unique for each request. If not provided, the service will generate one",
+            "example": "4d4eb584-a5cd-453b-8b67-567c1df26cb4"
+          }
+        }
+      },
+      "RESTGetStorageUrlParams": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "description": "File name to upload",
+            "example": "myFile.jpg"
+          },
+          "mediaType": {
+            "type": "string",
+            "description": "Mime type of the file to upload",
+            "example": "image/jpeg"
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "Unique query identifier. If not provided, one will be generated",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          }
+        }
+      },
+      "RESTStorageApiCallResult": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Generated presigned URL for uploading a file to Leia Storage",
+            "example": "https://leia-storage.s3.amazonaws.com/..."
+          },
+          "urlExpiresUTC": {
+            "type": "string",
+            "description": "Generated presigned URL expiration timestamp",
+            "example": "2021-04-28T12:00:00.000Z"
+          }
+        },
+        "required": [
+          "url",
+          "urlExpiresUTC"
+        ]
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about LeiaPix Cloud",
+    "url": "http://cloud.leiapix.com/"
+  }
+}
